@@ -4,6 +4,7 @@ import pytest
 pytestmark = pytest.mark.asyncio
 
 RESTURANTS_URL = "/v1/restaurants/"
+RESTURANT_URL = "/v1/restaurant/"
 
 
 async def test_get_restaurants(client):
@@ -64,3 +65,25 @@ async def test_get_restaurants_pagination(client):
     assert data["size"] == 1
     assert "total" in data
     assert data["total"] == len(data["items"]) * 2
+
+
+async def test_get_restaurant(client):
+    """Test getting a single resturant"""
+    valid_data = {"uuid": "951d9f8e-48fa-4391-b843-16d81d7f7358", "name": "Burger Hut"}
+    response = await client.get(RESTURANT_URL + valid_data["uuid"])
+    assert response.status_code == 200
+    data = response.json()
+    assert "uuid" in data
+    assert data["uuid"] == valid_data["uuid"]
+    assert "name" in data
+    assert data["name"] == valid_data["name"]
+
+
+@pytest.mark.parametrize("invalid_url", ["123", "456"])
+async def test_get_invalid_restaurant(client, invalid_url):
+    """Testing geting invalid uuid"""
+    response = await client.get(RESTURANT_URL + invalid_url)
+    assert response.status_code == 404
+    data = response.json()
+    assert "detail" in data
+    assert data["detail"] == "Restaurant Not Found"
