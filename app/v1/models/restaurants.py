@@ -3,14 +3,14 @@ from typing import Optional
 from pydantic import BaseModel, Field  # pylint: disable=no-name-in-module
 
 
-class RestaurantInfo(BaseModel):
+class RestaurantInfo(BaseModel):  # pylint: disable=too-few-public-methods
     """Restaurant info type class"""
 
     address: str
     phoneNumber: str
 
 
-class OpenTimes(BaseModel):
+class OpenTimes(BaseModel):  # pylint: disable=too-few-public-methods
     """Opten times type class"""
 
     sun: str
@@ -22,7 +22,7 @@ class OpenTimes(BaseModel):
     sat: str
 
 
-class DiningOptions(BaseModel):
+class DiningOptions(BaseModel):  # pylint: disable=too-few-public-methods
     """Dining options type class"""
 
     dineIn: bool
@@ -30,7 +30,7 @@ class DiningOptions(BaseModel):
     delivery: bool
 
 
-class Restaurants(BaseModel):
+class Restaurants(BaseModel):  # pylint: disable=too-few-public-methods
     """Restaurant type class"""
 
     uuid: str
