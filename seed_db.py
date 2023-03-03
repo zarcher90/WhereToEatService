@@ -1,3 +1,4 @@
+"""Data for mock database"""
 data = [
     {
         "name": "Burger Hut",
