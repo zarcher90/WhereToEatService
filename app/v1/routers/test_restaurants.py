@@ -1,10 +1,11 @@
 """Testing Resturant endpoints"""
+import uuid
 import pytest
 
 pytestmark = pytest.mark.asyncio
 
-RESTURANTS_URL = "/v1/restaurants/"
-RESTURANT_URL = "/v1/restaurant/"
+RESTURANTS_URL = "/v1/restaurants"
+RESTURANT_URL = "/v1/restaurant"
 
 
 async def test_get_restaurants(client):
@@ -70,7 +71,7 @@ async def test_get_restaurants_pagination(client):
 async def test_get_restaurant(client):
     """Test getting a single resturant"""
     valid_data = {"uuid": "951d9f8e-48fa-4391-b843-16d81d7f7358", "name": "Burger Hut"}
-    response = await client.get(RESTURANT_URL + valid_data["uuid"])
+    response = await client.get(f"{RESTURANT_URL}/{valid_data['uuid']}")
     assert response.status_code == 200
     data = response.json()
     assert "uuid" in data
@@ -82,8 +83,147 @@ async def test_get_restaurant(client):
 @pytest.mark.parametrize("invalid_url", ["123", "456"])
 async def test_get_invalid_restaurant(client, invalid_url):
     """Testing geting invalid uuid"""
-    response = await client.get(RESTURANT_URL + invalid_url)
+    response = await client.get(f"{RESTURANT_URL}/{invalid_url}")
     assert response.status_code == 404
     data = response.json()
     assert "detail" in data
     assert data["detail"] == "Restaurant Not Found"
+
+
+async def test_create_restaurant(client):
+    """Test creating a restaurant"""
+    payload = {
+        "name": "Zachs's Roadhouse",
+        "category": "American",
+        "info": {
+            "address": "109 Dolphin DR, Butler, PA 16002",
+            "phoneNumber": "(724) 822-8044",
+        },
+        "openTime": {
+            "sun": "Closed",
+            "mon": "Closed",
+            "tues": "Closed",
+            "wed": "Closed",
+            "thurs": "Closed",
+            "fri": "Closed",
+            "sat": "Closed",
+        },
+        "diningOptions": {"dineIn": True, "takeout": True, "delivery": False},
+        "rating": 2,
+    }
+    response = await client.post(RESTURANT_URL, json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert "uuid" in data
+    assert data["name"] == payload["name"]
+    assert data["category"] == payload["category"]
+    assert data["info"] == payload["info"]
+    assert data["openTime"] == payload["openTime"]
+    assert data["diningOptions"] == payload["diningOptions"]
+    assert data["rating"] == payload["rating"]
+
+
+async def test_create_restaurant_with_uuid(client):
+    """Test creating a restaurant with uuid"""
+    payload = {
+        "name": "Zachs's Bar",
+        "uuid": str(uuid.uuid4()),
+        "category": "Grill",
+        "info": {
+            "address": "104 Dolphin DR, Butler, PA 16002",
+            "phoneNumber": "(724) 822-8044",
+        },
+        "openTime": {
+            "sun": "Closed",
+            "mon": "11AM-10PM",
+            "tues": "11AM-10PM",
+            "wed": "11AM-10PM",
+            "thurs": "11AM-10PM",
+            "fri": "11AM-2PM",
+            "sat": "11AM-12PM",
+        },
+        "diningOptions": {"dineIn": True, "takeout": True, "delivery": False},
+        "rating": 2,
+    }
+    response = await client.post(RESTURANT_URL, json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["uuid"] == payload["uuid"]
+    assert data["name"] == payload["name"]
+    assert data["category"] == payload["category"]
+    assert data["info"] == payload["info"]
+    assert data["openTime"] == payload["openTime"]
+    assert data["diningOptions"] == payload["diningOptions"]
+    assert data["rating"] == payload["rating"]
+
+
+async def test_create_duplicate_restaurant(client):
+    """Test creating a duplicate restaurant"""
+    payload = {
+        "name": "Rachel's Roadhouse",
+        "category": "American",
+        "info": {
+            "address": "987 Fairfield Ln, Butler, PA 16001",
+            "phoneNumber": "(724) 841-0674",
+        },
+        "openTime": {
+            "sun": "12-11PM",
+            "mon": "11AM-11PM",
+            "tues": "11AM-11PM",
+            "wed": "11AM-11PM",
+            "thurs": "11AM-11PM",
+            "fri": "11AM-11PM",
+            "sat": "11AM-11PM",
+        },
+        "diningOptions": {"dineIn": True, "takeout": True, "delivery": False},
+        "rating": 4,
+    }
+    response = await client.post(RESTURANT_URL, json=payload)
+    assert response.status_code == 400
+    data = response.json()
+    assert "detail" in data
+    assert data["detail"] == "Restaurant Not Added"
+
+
+async def test_create_duplicate_uuid(client):
+    """Test creating a duplicate uuid"""
+    payload = {
+        "name": "Rach house",
+        "uuid": "ddaaa1b4-cd34-444f-ae8e-0b4c0561f733",
+        "category": "American",
+        "info": {
+            "address": "1000 Fairfield Ln, Butler, PA 16001",
+            "phoneNumber": "(724) 841-9876",
+        },
+        "openTime": {
+            "sun": "Closed",
+            "mon": "10AM-9PM",
+            "tues": "10AM-9PM",
+            "wed": "10AM-9PM",
+            "thurs": "11AM-9PM",
+            "fri": "Closed",
+            "sat": "11AM-10PM",
+        },
+        "diningOptions": {"dineIn": True, "takeout": True, "delivery": False},
+        "rating": 4,
+    }
+    response = await client.post(RESTURANT_URL, json=payload)
+    assert response.status_code == 400
+    data = response.json()
+    assert "detail" in data
+    assert data["detail"] == "Restaurant Not Added"
+
+
+async def test_create_with_missing_data(client):
+    """Test creating with missing data"""
+    payload = {
+        "name": "Rach house",
+        "uuid": "ddaaa1b4-cd34-444f-ae8e-0b4c0561f733",
+        "category": "American",
+        "info": {
+            "address": "800 Faird Ln, Butler, PA 16001",
+            "phoneNumber": "(724) 841-0934",
+        },
+    }
+    response = await client.post(RESTURANT_URL, json=payload)
+    assert response.status_code == 422

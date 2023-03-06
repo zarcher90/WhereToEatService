@@ -21,4 +21,4 @@ def test_info():
     assert response.status_code == 200
     data = response.json()
     assert "version" in data
-    assert data["version"] == "1.0.0"
+    assert data["version"] == "1.1.0"

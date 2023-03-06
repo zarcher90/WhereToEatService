@@ -16,4 +16,4 @@ async def root():
 @app.get("/info")
 async def info():
     """Info path"""
-    return {"version": "1.0.0"}
+    return {"version": "1.1.0"}
