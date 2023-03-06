@@ -1,4 +1,5 @@
 """Restaurants Data Model"""
+import uuid
 from typing import Optional
 from pydantic import BaseModel, Field  # pylint: disable=no-name-in-module
 
@@ -33,7 +34,7 @@ class DiningOptions(BaseModel):  # pylint: disable=too-few-public-methods
 class Restaurants(BaseModel):  # pylint: disable=too-few-public-methods
     """Restaurant type class"""
 
-    uuid: str
+    uuid: str = str(uuid.uuid4())
     name: str
     category: str
     info: RestaurantInfo = Field(...)
