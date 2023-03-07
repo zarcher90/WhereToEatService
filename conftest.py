@@ -25,7 +25,7 @@ async def mongo_mock_fixture(monkeypatch):
     """Creates the mock for mongo database"""
     client = AsyncMongoMockClient()["where_to_eat"]
     col = client["restaurants"]
-    await col.insert_many(seed_db.data)
+    await col.insert_many(seed_db.data[:2])
 
     def mocked_database():
         return client
