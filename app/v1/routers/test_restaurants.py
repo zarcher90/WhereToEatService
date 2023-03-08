@@ -68,9 +68,8 @@ async def test_get_restaurants_pagination(client):
     assert data["total"] == len(data["items"]) * 2
 
 
-async def test_get_restaurant(client):
+async def test_get_restaurant(client, valid_data):
     """Test getting a single resturant"""
-    valid_data = {"uuid": "951d9f8e-48fa-4391-b843-16d81d7f7358", "name": "Burger Hut"}
     response = await client.get(f"{RESTURANT_URL}/{valid_data['uuid']}")
     assert response.status_code == 200
     data = response.json()
@@ -227,3 +226,20 @@ async def test_create_with_missing_data(client):
     }
     response = await client.post(RESTURANT_URL, json=payload)
     assert response.status_code == 422
+
+
+async def test_delete_restaurant(client, valid_data):
+    """Test deletion of a restaurant"""
+    response = await client.delete(f"{RESTURANT_URL}/{valid_data['uuid']}")
+    assert response.status_code == 200
+    data = response.json()
+    assert data == {"message": "Successful"}
+
+
+async def test_delete_invalid_resaurant(client):
+    """Test deletion of a restaurant that does not exist"""
+    response = await client.delete(RESTURANT_URL + "/123")
+    assert response.status_code == 400
+    data = response.json()
+    assert "detail" in data
+    assert data["detail"] == "There was an error"

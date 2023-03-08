@@ -21,6 +21,18 @@ async def is_restaurant_duplicate(restaurant: Restaurants):
     return False
 
 
+async def does_restaurant_exist(restaurant_id: str):
+    """Checks to see if restaurant exist in db based on uuid
+    Parameters:
+        restaurant_id: str
+    Return:
+        boolean: True or False to indicate existing object"""
+    if await db.get_restaurant_by_uuid(restaurant_id) is not None:
+        return True
+
+    return False
+
+
 @router.get("/restaurants", response_model=Page[Restaurants])
 async def get_restaurants():
     """GET all restaurants"""
@@ -42,6 +54,15 @@ async def add_restaurant(restaurant: Restaurants):
         await db.add_restaurant(restaurant.dict())
         return restaurant
     raise HTTPException(status_code=400, detail="Restaurant Not Added")
+
+
+@router.delete("/restaurant/{restaurant_id}")
+async def delete_restaurant(restaurant_id):
+    """Delete a restaurant"""
+    if await does_restaurant_exist(restaurant_id):
+        await db.delete_restaurant(restaurant_id)
+        return {"message": "Successful"}
+    raise HTTPException(status_code=400, detail="There was an error")
 
 
 add_pagination(router)

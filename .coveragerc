@@ -1,0 +1,4 @@
+[run]
+omit =
+    # omit seed_db file as this has nothing to do with the application
+    *seed_db.py*

@@ -14,9 +14,8 @@ async def test_get_all_data():
     assert len(data) == 2
 
 
-async def test_get_by_uuid():
+async def test_get_by_uuid(valid_data):
     """Testing get by uuid"""
-    valid_data = {"uuid": "951d9f8e-48fa-4391-b843-16d81d7f7358", "name": "Burger Hut"}
     data = await database.get_restaurant_by_uuid(valid_data["uuid"])
     assert data is not None
     assert data["uuid"] == valid_data["uuid"]
@@ -29,9 +28,8 @@ async def test_invalid_uuid():
     assert data is None
 
 
-async def test_get_by_name():
+async def test_get_by_name(valid_data):
     """Testing get by name"""
-    valid_data = {"uuid": "951d9f8e-48fa-4391-b843-16d81d7f7358", "name": "Burger Hut"}
     data = await database.get_restaurant_by_name(valid_data["name"])
     assert data is not None
     assert data["uuid"] == valid_data["uuid"]
@@ -39,9 +37,8 @@ async def test_get_by_name():
 
 
 @pytest.mark.skip("Bug - https://zach-archer.atlassian.net/browse/WTE-18")
-async def test_get_by_name_lower():
+async def test_get_by_name_lower(valid_data):
     """Testing get by name with case sensitive data"""
-    valid_data = {"uuid": "951d9f8e-48fa-4391-b843-16d81d7f7358", "name": "Burger Hut"}
     data = await database.get_restaurant_by_name(valid_data["name"].lower())
     assert data is not None
     assert data["uuid"] == valid_data["uuid"]
@@ -80,3 +77,10 @@ async def test_add_restaurant():
     created = await database.get_restaurant_by_uuid(data["uuid"])
     assert created is not None
     assert created == data
+
+
+async def test_delete_restaurant(valid_data):
+    """Testing delete restaurant"""
+    await database.delete_restaurant(valid_data["uuid"])
+    data = await database.get_restaurant_by_uuid(valid_data["uuid"])
+    assert data is None
