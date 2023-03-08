@@ -1,5 +1,6 @@
 """Pytest configuration File"""
 import asyncio
+import pytest
 import pytest_asyncio
 from httpx import AsyncClient
 from mongomock_motor import AsyncMongoMockClient
@@ -31,3 +32,9 @@ async def mongo_mock_fixture(monkeypatch):
         return client
 
     monkeypatch.setattr("app.database.where_to_eat", mocked_database)
+
+
+@pytest.fixture(name="valid_data")
+def valid_data_fixture():
+    """Fixture for returning valid data from the seed script to be used during testing"""
+    return {"uuid": seed_db.data[0]["uuid"], "name": seed_db.data[0]["name"]}
