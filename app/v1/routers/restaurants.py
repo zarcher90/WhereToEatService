@@ -2,7 +2,7 @@
 from fastapi import APIRouter, HTTPException
 from fastapi_pagination import Page, add_pagination, paginate
 import app.database as db
-from app.v1.models.restaurants import Restaurants
+from app.v1.models.restaurants import Restaurants, UpdateRestaurants
 
 router = APIRouter()
 
@@ -56,8 +56,17 @@ async def add_restaurant(restaurant: Restaurants):
     raise HTTPException(status_code=400, detail="Restaurant Not Added")
 
 
+@router.put("/restaurant/{restaurant_id}", response_model=Restaurants)
+async def update_restaurant(restaurant_id: str, restaurant: UpdateRestaurants):
+    """Update restaurant"""
+    if await does_restaurant_exist(restaurant_id):
+        await db.update_restaurant(restaurant_id, restaurant.dict())
+        return await db.get_restaurant_by_uuid(restaurant_id)
+    raise HTTPException(status_code=404, detail="Restaurant Not Found")
+
+
 @router.delete("/restaurant/{restaurant_id}")
-async def delete_restaurant(restaurant_id):
+async def delete_restaurant(restaurant_id: str):
     """Delete a restaurant"""
     if await does_restaurant_exist(restaurant_id):
         await db.delete_restaurant(restaurant_id)

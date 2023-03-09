@@ -41,3 +41,14 @@ class Restaurants(BaseModel):  # pylint: disable=too-few-public-methods
     openTime: OpenTimes = Field(...)
     diningOptions: DiningOptions = Field(...)
     rating: Optional[int] = None
+
+
+class UpdateRestaurants(BaseModel):  # pylint: disable=too-few-public-methods
+    """Update Restaurant type class"""
+
+    name: str
+    category: str
+    info: RestaurantInfo = Field(...)
+    openTime: OpenTimes = Field(...)
+    diningOptions: DiningOptions = Field(...)
+    rating: Optional[int] = None

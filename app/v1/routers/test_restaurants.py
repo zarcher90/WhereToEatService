@@ -228,6 +228,34 @@ async def test_create_with_missing_data(client):
     assert response.status_code == 422
 
 
+async def test_update_restaurant(client, valid_data):
+    """Test update restaurant"""
+    get_response = await client.get(f"{RESTURANT_URL}/{valid_data['uuid']}")
+    payload = get_response.json()
+    payload["name"] = "Changed the name!"
+    response = await client.put(f"{RESTURANT_URL}/{valid_data['uuid']}", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["name"] == payload["name"]
+
+
+async def test_update_invalid_restaurant(client, valid_data):
+    """Test update with invalid restaurant"""
+    get_response = await client.get(f"{RESTURANT_URL}/{valid_data['uuid']}")
+    payload = get_response.json()
+    response = await client.put(f"{RESTURANT_URL}/123", json=payload)
+    assert response.status_code == 404
+    data = response.json()
+    assert data["detail"] == "Restaurant Not Found"
+
+
+async def test_update_invalid_data(client, valid_data):
+    """Test update with invalid json data"""
+    payload = {"test": "test"}
+    response = await client.put(f"{RESTURANT_URL}/{valid_data['uuid']}", json=payload)
+    assert response.status_code == 422
+
+
 async def test_delete_restaurant(client, valid_data):
     """Test deletion of a restaurant"""
     response = await client.delete(f"{RESTURANT_URL}/{valid_data['uuid']}")

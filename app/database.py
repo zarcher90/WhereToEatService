@@ -65,6 +65,21 @@ async def add_restaurant(restaurant: dict):
         raise HTTPException(status_code=500, detail="Service is down") from error
 
 
+async def update_restaurant(restaurant_id: str, restaurant_data: dict):
+    """Update restaurant
+    Parameters:
+        restaurant_id: str UUID of the restaurant to be updated
+        restaurant_data: dict Data that is to be updated
+    """
+    try:
+        return await where_to_eat().restaurants.update_one(
+            {"uuid": restaurant_id}, {"$set": restaurant_data}
+        )
+    except pymongo.errors.ServerSelectionTimeoutError as error:
+        logging.error(error)
+        raise HTTPException(status_code=500, detail="Service is down") from error
+
+
 async def delete_restaurant(uuid: str):
     """Delete restaurant from collection
     Parameters:
