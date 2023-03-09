@@ -79,6 +79,13 @@ async def test_add_restaurant():
     assert created == data
 
 
+async def test_update_restaurant(valid_data):
+    """Testing update restaurant"""
+    await database.update_restaurant(valid_data["uuid"], {"name": "Changed the name"})
+    data = await database.get_restaurant_by_uuid(valid_data["uuid"])
+    assert data["name"] == "Changed the name"
+
+
 async def test_delete_restaurant(valid_data):
     """Testing delete restaurant"""
     await database.delete_restaurant(valid_data["uuid"])
