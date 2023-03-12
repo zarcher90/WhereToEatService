@@ -1,4 +1,5 @@
 """Database Module"""
+import re
 import logging
 from fastapi import HTTPException
 import motor.motor_asyncio
@@ -46,7 +47,9 @@ async def get_restaurant_by_name(name: str):
     Return:
         Restaurant: restaurant json object"""
     try:
-        return await where_to_eat().restaurants.find_one({"name": name})
+        return await where_to_eat().restaurants.find_one(
+            {"name": re.compile(name, re.IGNORECASE)}
+        )
     except pymongo.errors.ServerSelectionTimeoutError as error:
         logging.error(error)
         raise HTTPException(status_code=500, detail="Service is down") from error

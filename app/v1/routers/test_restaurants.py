@@ -4,13 +4,12 @@ import pytest
 
 pytestmark = pytest.mark.asyncio
 
-RESTURANTS_URL = "/v1/restaurants"
-RESTURANT_URL = "/v1/restaurant"
+RESTAURANTS_URL = "/v1/restaurants"
 
 
 async def test_get_restaurants(client):
     """Test the get restaurants url"""
-    response = await client.get(RESTURANTS_URL)
+    response = await client.get(RESTAURANTS_URL)
     assert response.status_code == 200
     data = response.json()
     assert "items" in data
@@ -27,7 +26,7 @@ async def test_get_restaurants(client):
 
 async def test_get_restaurants_contract(client):
     """Ensuring the return data is correct"""
-    response = await client.get(RESTURANTS_URL)
+    response = await client.get(RESTAURANTS_URL)
     assert response.status_code == 200
     data = response.json()
     for restaurant in data["items"]:
@@ -55,7 +54,7 @@ async def test_get_restaurants_contract(client):
 async def test_get_restaurants_pagination(client):
     """Testing pagination for the GET endpoint"""
     params = {"page": 1, "size": 1}
-    response = await client.get(RESTURANTS_URL, params=params)
+    response = await client.get(RESTAURANTS_URL, params=params)
     assert response.status_code == 200
     data = response.json()
     assert "page" in data
@@ -70,7 +69,7 @@ async def test_get_restaurants_pagination(client):
 
 async def test_get_restaurant(client, valid_data):
     """Test getting a single resturant"""
-    response = await client.get(f"{RESTURANT_URL}/{valid_data['uuid']}")
+    response = await client.get(f"{RESTAURANTS_URL}/{valid_data['uuid']}")
     assert response.status_code == 200
     data = response.json()
     assert "uuid" in data
@@ -82,7 +81,7 @@ async def test_get_restaurant(client, valid_data):
 @pytest.mark.parametrize("invalid_url", ["123", "456"])
 async def test_get_invalid_restaurant(client, invalid_url):
     """Testing geting invalid uuid"""
-    response = await client.get(f"{RESTURANT_URL}/{invalid_url}")
+    response = await client.get(f"{RESTAURANTS_URL}/{invalid_url}")
     assert response.status_code == 404
     data = response.json()
     assert "detail" in data
@@ -110,7 +109,7 @@ async def test_create_restaurant(client):
         "diningOptions": {"dineIn": True, "takeout": True, "delivery": False},
         "rating": 2,
     }
-    response = await client.post(RESTURANT_URL, json=payload)
+    response = await client.post(RESTAURANTS_URL, json=payload)
     assert response.status_code == 200
     data = response.json()
     assert "uuid" in data
@@ -144,7 +143,7 @@ async def test_create_restaurant_with_uuid(client):
         "diningOptions": {"dineIn": True, "takeout": True, "delivery": False},
         "rating": 2,
     }
-    response = await client.post(RESTURANT_URL, json=payload)
+    response = await client.post(RESTAURANTS_URL, json=payload)
     assert response.status_code == 200
     data = response.json()
     assert data["uuid"] == payload["uuid"]
@@ -177,7 +176,7 @@ async def test_create_duplicate_restaurant(client):
         "diningOptions": {"dineIn": True, "takeout": True, "delivery": False},
         "rating": 4,
     }
-    response = await client.post(RESTURANT_URL, json=payload)
+    response = await client.post(RESTAURANTS_URL, json=payload)
     assert response.status_code == 400
     data = response.json()
     assert "detail" in data
@@ -206,7 +205,7 @@ async def test_create_duplicate_uuid(client):
         "diningOptions": {"dineIn": True, "takeout": True, "delivery": False},
         "rating": 4,
     }
-    response = await client.post(RESTURANT_URL, json=payload)
+    response = await client.post(RESTAURANTS_URL, json=payload)
     assert response.status_code == 400
     data = response.json()
     assert "detail" in data
@@ -224,16 +223,16 @@ async def test_create_with_missing_data(client):
             "phoneNumber": "(724) 841-0934",
         },
     }
-    response = await client.post(RESTURANT_URL, json=payload)
+    response = await client.post(RESTAURANTS_URL, json=payload)
     assert response.status_code == 422
 
 
 async def test_update_restaurant(client, valid_data):
     """Test update restaurant"""
-    get_response = await client.get(f"{RESTURANT_URL}/{valid_data['uuid']}")
+    get_response = await client.get(f"{RESTAURANTS_URL}/{valid_data['uuid']}")
     payload = get_response.json()
     payload["name"] = "Changed the name!"
-    response = await client.put(f"{RESTURANT_URL}/{valid_data['uuid']}", json=payload)
+    response = await client.put(f"{RESTAURANTS_URL}/{valid_data['uuid']}", json=payload)
     assert response.status_code == 200
     data = response.json()
     assert data["name"] == payload["name"]
@@ -241,9 +240,9 @@ async def test_update_restaurant(client, valid_data):
 
 async def test_update_invalid_restaurant(client, valid_data):
     """Test update with invalid restaurant"""
-    get_response = await client.get(f"{RESTURANT_URL}/{valid_data['uuid']}")
+    get_response = await client.get(f"{RESTAURANTS_URL}/{valid_data['uuid']}")
     payload = get_response.json()
-    response = await client.put(f"{RESTURANT_URL}/123", json=payload)
+    response = await client.put(f"{RESTAURANTS_URL}/123", json=payload)
     assert response.status_code == 404
     data = response.json()
     assert data["detail"] == "Restaurant Not Found"
@@ -252,13 +251,13 @@ async def test_update_invalid_restaurant(client, valid_data):
 async def test_update_invalid_data(client, valid_data):
     """Test update with invalid json data"""
     payload = {"test": "test"}
-    response = await client.put(f"{RESTURANT_URL}/{valid_data['uuid']}", json=payload)
+    response = await client.put(f"{RESTAURANTS_URL}/{valid_data['uuid']}", json=payload)
     assert response.status_code == 422
 
 
 async def test_delete_restaurant(client, valid_data):
     """Test deletion of a restaurant"""
-    response = await client.delete(f"{RESTURANT_URL}/{valid_data['uuid']}")
+    response = await client.delete(f"{RESTAURANTS_URL}/{valid_data['uuid']}")
     assert response.status_code == 200
     data = response.json()
     assert data == {"message": "Successful"}
@@ -266,7 +265,7 @@ async def test_delete_restaurant(client, valid_data):
 
 async def test_delete_invalid_resaurant(client):
     """Test deletion of a restaurant that does not exist"""
-    response = await client.delete(RESTURANT_URL + "/123")
+    response = await client.delete(RESTAURANTS_URL + "/123")
     assert response.status_code == 400
     data = response.json()
     assert "detail" in data
