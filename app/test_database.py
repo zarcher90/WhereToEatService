@@ -36,7 +36,6 @@ async def test_get_by_name(valid_data):
     assert data["name"] == valid_data["name"]
 
 
-@pytest.mark.skip("Bug - https://zach-archer.atlassian.net/browse/WTE-18")
 async def test_get_by_name_lower(valid_data):
     """Testing get by name with case sensitive data"""
     data = await database.get_restaurant_by_name(valid_data["name"].lower())
