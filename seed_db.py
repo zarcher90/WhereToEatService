@@ -191,7 +191,9 @@ def load_data(db_url: str):
     """Loads a database with the initial data
     Parameters:
         db_url: str Database connection url"""
-    client = motor.motor_asyncio.AsyncIOMotorClient(db_url)
+    client = motor.motor_asyncio.AsyncIOMotorClient(
+        db_url, tls=True, tlsAllowInvalidCertificates=True
+    )
     client.where_to_eat.restaurants.insert_many(data)
 
 

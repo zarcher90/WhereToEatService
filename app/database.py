@@ -1,12 +1,17 @@
 """Database Module"""
+import os
 import re
 import logging
 from fastapi import HTTPException
 import motor.motor_asyncio
 import pymongo
-from app.config import config
+from dotenv import load_dotenv
 
-client = motor.motor_asyncio.AsyncIOMotorClient(config.MONGODB_URL)
+load_dotenv()
+
+client = motor.motor_asyncio.AsyncIOMotorClient(
+    os.getenv("MONGODB_URL"), tls=True, tlsAllowInvalidCertificates=True
+)
 
 
 def where_to_eat():
