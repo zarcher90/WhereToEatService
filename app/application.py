@@ -1,5 +1,6 @@
 """Application Entry Point"""
 from fastapi import FastAPI
+from mangum import Mangum
 from app.v1.routers import restaurants as restaurants_v1
 
 app = FastAPI()
@@ -17,3 +18,6 @@ async def root():
 async def info():
     """Info path"""
     return {"version": "1.1.0"}
+
+
+handler = Mangum(app)
